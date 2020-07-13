@@ -2,7 +2,7 @@
 #include <string>
 #include <stack>
 #include <iomanip>
-
+//目前只支持二元，且必须要有括号
 int main()
 {
 	std::stack<char> ops;	
