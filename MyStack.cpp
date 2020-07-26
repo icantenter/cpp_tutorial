@@ -3,41 +3,23 @@
 #include <stack>
 #include <cstdio>
 #include <cstdlib>
+#include <map>
 //#include "MyStack.h"
 #include <vector>
 int main()
 {
-    /*char ch;
-
-    MyStack<char> stack(100);
-    while (true)
-    {
-        std::cin >> ch;
-        if (ch != '-')
-        {
-            stack.push(&ch);
-        }
-        else if (!stack.isEmpty())
-        {
-            std::cout << stack.pop() << ' ' << stack.size() << " left on stack";
-        }
-        
-    }*/
-    //MyStack<int> stack(1);
-
-    //stack.push(0);
     std::vector<int> ve;
+    std::map<int, int> the_map;
+    the_map.at(0);
     ve.pop_back();
-    //stack.push(1);
-    //stack.isEmpty();
-    //<< stack.pop() << ' ' << stack.pop();
+    std::stack<int> st;
+    st.pop();
     return 0;
 }
 
 template <typename Item>
 struct _Stack_base
 {
-
     struct _Stack_impl
     {
         Item _M_start;
@@ -88,11 +70,9 @@ void MyStack<Item>::_M_default_append(size_type __n)
 
         if (__navail >= __n)
         {
-            _GLIBCXX_ASAN_ANNOTATE_GROW(__n);
             this->_M_impl._M_finish =
                 std::__uninitialized_default_n_a(this->_M_impl._M_finish,
                                                  __n, _M_get_Tp_allocator());
-            _GLIBCXX_ASAN_ANNOTATE_GREW(__n);
         }
         else
         {
@@ -116,7 +96,6 @@ void MyStack<Item>::_M_default_append(size_type __n)
                 _M_deallocate(__new_start, __len);
                 __throw_exception_again;
             }
-            _GLIBCXX_ASAN_ANNOTATE_REINIT;
             std::_Destroy(this->_M_impl._M_start, this->_M_impl._M_finish,
                           _M_get_Tp_allocator());
             _M_deallocate(this->_M_impl._M_start,
