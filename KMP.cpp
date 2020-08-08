@@ -1,98 +1,71 @@
 #include <iostream>
 #include <string>
-void move_prefix_table(int prefix[], size_t size);
+#include <vector>
+/* String matching using KMP algorithm */
 void prefix_table(std::string &pattern, int prefix[], size_t size);
-void kmp_search(std::string &text, std::string &pattern);
+std::vector<int> kmp_search(std::string &text, std::string &pattern);
 int main()
 {
     std::string pattern, text;
-
+    std::vector<int> index_of_found_substring;
     std::cin >> text >> pattern;
-    kmp_search(text, pattern);
+    index_of_found_substring = kmp_search(text, pattern);
+    
+    for (auto &&value : index_of_found_substring)
+    {
+        std::cout << value << ' ';
+    }
+    
     return 0;
 }
 
-void kmp_search(std::string &text, std::string &pattern)
+std::vector<int> kmp_search(std::string &text, std::string &pattern)
 {
     size_t n = pattern.length();
     size_t m = text.length();
     int *prefix = new int[n];
+    std::vector<int> index_of_found_substring;
     prefix_table(pattern, prefix, n);
 
-    move_prefix_table(prefix, n);
-    //len(text) = m
-    //len(pattern) = n
-
-    int i = 0, j = 0;
-    while (i < m)
+    int j = 0;
+    for (int i = 0; i < m; i++)
     {
-        //完全匹配
-        if (j == n - 1 && pattern[j] == text[i])
-        {
-            std::cout << i - j << std::endl;
-            j = prefix[j];
+        while (j && pattern[j] != text[i])
+        {//如果失配，那么不断回跳，直到可以继续匹配
+            j = prefix[j - 1];
         }
-        //当前匹配
         if (text[i] == pattern[j])
         {
-            i++;
             j++;
         }
-        //不匹配
-        else
+        if (j == n)
         {
-            //根据prefix_table前滚
-            j = prefix[j];
-            if (j == -1)
-            {
-                i++;
-                j = 0;
-            }
+            index_of_found_substring.push_back(i - n + 2);
+            j = prefix[j - 1];
         }
     }
-}
-
-//prefix_table向右一格，-1补位
-void move_prefix_table(int prefix[], size_t size)
-{
-    for (int i = size - 1; i > 0; i--)
-    {
-        prefix[i] = prefix[i - 1];
-    }
-    prefix[0] = -1;
+    
+    return index_of_found_substring;
 }
 
 //"前缀"指除了最后一个字符以外，一个字符串的全部头部组合；"后缀"指除了第一个字符以外，一个字符串的全部尾部组合
-//生成前缀表
+////prefix_table存放的是最长公共前后缀的长度
 void prefix_table(std::string &pattern, int prefix[], size_t size)
 {
     prefix[0] = 0;
-    int len = 0;
-    int i = 1;
-    while (i < size)
+    int len = 0; //最长公共前后缀的长度
+    for (int i = 1; i < size; i++)
     {
-        //prefix_table存放的是最长公共前后缀。
-        //所以也用到了匹配。
+        //如果len为0，就不用回跳
+        while (pattern[i] != pattern[len] && len != 0)
+        {   
+            //ABAB# 匹配到#时失败，ABAB最长公共前后缀为2,可以看出应该用pattern[2]和#比较(index从零开始)
+            len = prefix[len - 1];
+        }
         if (pattern[i] == pattern[len])
         {
             len++;
-            prefix[i] = len;
-            i++;
         }
-        else
-        {
-            //和最长前缀匹配不上。就利用已经求出的prefix_table进行匹配。
-            //直到匹配成功，或到prefix_table尽头
-            if (len > 0)
-            {
-                //prefix_table整体还没后移,所以是len - 1
-                len = prefix[len - 1];
-            }
-            else
-            {
-                prefix[i] = len;
-                i++;
-            }
-        }
+        prefix[i] = len;
     }
 }
