@@ -1,85 +1,61 @@
 #include <iostream>
 #include <string>
+#include <cstring>
 
-void FillVacancy(std::string &temp, int length);
-std::string mul(std::string a, std::string b);
-std::string add(std::string a, std::string b);
-
+void to_Int(std::string &_string, int num[]);
+void mul(int a[], int b[], int product[]);
 int main()
 {
+    int num_a[10000], num_b[10000];
+    int product[10000];
     std::string a, b;
     //getline有时候会有点问题
     std::cin >> a >> b;
-    std::cout << mul(a, b);
+    memset(num_a, 0, sizeof(num_a));
+    memset(num_b, 0, sizeof(num_b));
+    memset(product, 0, sizeof(product));
+    to_Int(a, num_a);
+    to_Int(b, num_b);
+    mul(num_a, num_b, product);
+
+    for (int i = product[0]; i >= 1; i--)
+    {
+        std::cout << product[i];
+    }
+
     return 0;
 }
 
-std::string mul(std::string a, std::string b)
+void to_Int(std::string &_string, int num[])
 {
-    std::string ans;
-    int offset;
-    int _temp;
-    for (int i = a.length() - 1; i >= 0; i--)
+    num[0] = _string.length();
+    for (int i = 1; i <= _string.length(); i++)
     {
-        offset = 0;
-        //初始当前乘数的位数
-        std::string temp(a.length() - i - 1, '0');
+        num[i] = _string[num[0] - i] - '0';
+    }
+}
 
-        for (int j = b.length() - 1; j >= 0; j--)
-        {       //这里加法类似
-            _temp = (a[i] - '0') * (b[j] - '0') + offset;
-            offset = _temp / 10;
-            _temp %= 10;
-            temp = char('0' + _temp) + temp;
-        }
-        //最后的offset要加上
-        if (offset)
+void mul(int a[], int b[], int product[])
+{
+    int i, j;
+    for (i = 1; i <= a[0]; i++)
+    {
+        int offset = 0;
+        for (j = 1; j <= b[0]; j++)
         {
-            temp = char(offset + '0') + temp;
+            product[i + j - 1] += a[i] * b[j] + offset;
+            offset = product[i + j - 1] / 10;
+            product[i + j - 1] %= 10;
         }
-        ans = add(ans, temp);
+        //加上最后的offset
+        product[i + j - 1] += offset;
     }
-    //trim无意义的0
-    for (int i = 0; ; i++) 
+    //trim
+    int temp_index = i + j - 1;
+    while (product[temp_index] == 0 && temp_index > 1)
     {
-        if (ans[i] != '0' || i == ans.length() - 1)
-        {
-            ans = ans.substr(i);
-            break;
-        }
+        temp_index--;
     }
-    
-    return ans;
+    product[0] = temp_index;
 }
 
-
-//首要的是可读性，其次是运行
-std::string add(std::string a, std::string b)
-{
-    int offset = 0;
-    std::string ans;
-    a.length() > b.length()? FillVacancy(b, a.length()):FillVacancy(a, b.length());
-    for (int i = a.length() - 1; i >= 0 ; i--)
-    {
-        int temp;
-
-        temp = a[i] - '0' + b[i] - '0' + offset;
-        offset = temp / 10;
-        temp %= 10;
-        ans = char('0' + temp) + ans;
-    }
-    if (offset)
-    {
-        ans = char(offset + '0') + ans;
-    }
-    
-    return ans;
-}
-//补位使两个数能对齐，循环处理更方便
-void FillVacancy(std::string& temp, int length)
-{
-    while (temp.length() < length)
-    {
-        temp = '0' + temp;
-    }
-}
