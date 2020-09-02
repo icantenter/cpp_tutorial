@@ -58,8 +58,11 @@ void prefix_table(std::string &pattern, int prefix[], size_t size)
     {
         //如果len为0，就不用回跳
         while (pattern[i] != pattern[len] && len != 0)
-        {   
-            //ABAB# 匹配到#时失败，ABAB最长公共前后缀为2,可以看出应该用pattern[2]和#比较(index从零开始)
+        {   //不匹配时，将pattern[len]指向前一个截断字符串的最长公共前缀的下一个字符
+            //不匹配时，回看前一个截断字符串，它如果有公共前后缀。
+            //它的最长公共后缀成为新的匹配字符串(原来的匹配字符串由于不匹配而失效了)的前缀，因为公共前缀等于公共后缀。
+            //然后pattern[len]指向最长公共前缀的下一个字符(此时等同于加上了前缀)，继续匹配上一个匹配字符串没能匹配的字符。重复这个过程
+            
             len = prefix[len - 1];
         }
         if (pattern[i] == pattern[len])
