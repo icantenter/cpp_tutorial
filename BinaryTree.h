@@ -4,37 +4,24 @@
 #include <queue>
 #include <string>
 
-
 //没有进行测试
 template <typename Key, typename Value>
 struct BinaryTreeNode
 {
-public:
     Key key;
     Value val;
     BinaryTreeNode *left, *right;
     int N;
 
-    BinaryTreeNode(Key key, Value val, int N);
-    BinaryTreeNode();
+    BinaryTreeNode(Key key, Value val, int N, BinaryTreeNode *left, BinaryTreeNode *right)
+    {
+        this->key = key;
+        this->val = val;
+        this->N = N;
+        this->left = left;
+        this->right = right;
+    }
 };
-
-template <typename Key, typename Value>
-BinaryTreeNode<Key, Value>::BinaryTreeNode(Key key, Value val, int N)
-{
-    this->key = key;
-    this->val = val;
-    this->N = N;
-    this->left = NULL;
-    this->right = NULL;
-}
-
-template <typename Key, typename Value>
-BinaryTreeNode<Key, Value>::BinaryTreeNode()
-{
-    this->left = NULL;
-    this->right = NULL;
-}
 
 template <typename Key, typename Value>
 class BinaryTree
@@ -42,9 +29,9 @@ class BinaryTree
     typedef struct BinaryTreeNode<Key, Value> Node;
 
 private:
-    Node * root;
+    Node *root;
 
-    int size(Node * x)
+    int size(Node *x)
     {
         if (x == NULL)
         {
@@ -56,11 +43,11 @@ private:
         }
     }
     //如果有key对应的Node则覆盖它的值，无则在树的底部创建。
-    Node * put(Node * x, Key key, Value val)
+    Node *put(Node *x, Key key, Value val)
     {
         if (x == NULL)
         {
-            return new Node(key, val, 1);
+            return new Node(key, val, 1, NULL, NULL);
         }
         Key cmp = key - x->key;
         if (cmp < 0)
@@ -81,7 +68,7 @@ private:
         return x;
     }
 
-    Value get(Node * x, Key key)
+    Value get(Node *x, Key key)
     {
         if (x == NULL)
         {
@@ -103,7 +90,7 @@ private:
         }
     }
 
-    Node * min(Node * x)
+    Node *min(Node *x)
     {
         if (x->left == NULL)
         {
@@ -112,7 +99,7 @@ private:
         return min(x->left);
     }
 
-    Node * max(Node * x)
+    Node *max(Node *x)
     {
         if (x->right == NULL)
         {
@@ -122,7 +109,7 @@ private:
     }
 
     //比较大小进入对应的子树
-    Node * floor(Node * x, Key key)
+    Node *floor(Node *x, Key key)
     {
         //二叉树的性质: 一个父节点的值是左(右)子树的最大(小)值。
         //只要子树不为NULL，查找过程中就不需要考虑上方节点。
@@ -144,9 +131,9 @@ private:
             return floor(x->left, key);
         }
         //进入右子树查找
-        Node * t = floor(x->right, key);
+        Node *t = floor(x->right, key);
 
-            if (t != NULL)
+        if (t != NULL)
         {
             //直接找到了对应节点
             return t;
@@ -157,7 +144,7 @@ private:
             return x;
         }
     }
-    Node * ceiling(Node * x, Key key)
+    Node *ceiling(Node *x, Key key)
     {
         //二叉树的性质: 一个父节点的值是左(右)子树的最大(小)值。
         //只要子树不为NULL，查找过程中就不需要考虑上方节点。
@@ -179,9 +166,9 @@ private:
             return ceiling(x->right, key);
         }
         //进入右子树查找
-        Node * t = ceiling(x->left, key);
+        Node *t = ceiling(x->left, key);
 
-            if (t != NULL)
+        if (t != NULL)
         {
             //直接找到了对应节点
             return t;
@@ -193,7 +180,7 @@ private:
         }
     }
 
-    Node * select(Node * x, int k)
+    Node *select(Node *x, int k)
     {
         //返回排名为k的结点
         if (x == NULL)
@@ -215,7 +202,7 @@ private:
         }
     }
 
-    int rank(Key key, Node * x)
+    int rank(Key key, Node *x)
     {
         //返回以x为根节点的子树中小于x.key的键的数量
         if (x == NULL)
@@ -237,11 +224,11 @@ private:
         }
     }
 
-    Node * deleteMin(Node * x)
+    Node *deleteMin(Node *x)
     {
         if (x->left == NULL)
         {
-            Node * temp = x->right;
+            Node *temp = x->right;
             delete x;
             return temp;
         }
@@ -251,11 +238,11 @@ private:
         return x;
     }
 
-    Node * deleteMax(Node * x)
+    Node *deleteMax(Node *x)
     {
         if (x->right == NULL)
         {
-            Node * temp = x->left;
+            Node *temp = x->left;
             delete x;
             return temp;
         }
@@ -264,7 +251,7 @@ private:
         return x;
     }
 
-    Node * deletenode(Node * x, Key key)
+    Node *deletenode(Node *x, Key key)
     {
         if (x == NULL)
             return NULL;
@@ -275,7 +262,7 @@ private:
             x->right = deletenode(x->right, key);
         else
         {
-            Node * t;
+            Node *t;
             if (x->right == NULL)
             {
                 t = x->left;
@@ -289,15 +276,15 @@ private:
                 return t;
             }
             t = x;
-            x = min(t.right);
-            x->right = deleteMin(t.right);
-            x->left = t.left;
+            x = min(t->right);
+            x->right = deleteMin(t->right);
+            x->left = t->left;
         }
-        x->size = size(x->left) + size(x->right) + 1;
+        x->N = size(x->left) + size(x->right) + 1;
         return x;
     }
 
-    void keys(Node * x, std::queue<Key> queue, Key lo, Key hi)
+    void keys(Node *x, std::queue<Key> queue, Key lo, Key hi)
     {
 
         if (x == NULL)
@@ -314,8 +301,8 @@ private:
     }
 
 public:
-    Key min() { return min(root).key; }
-    Key max() { return max(root).key; }
+    Key min() { return min(root)->key; }
+    Key max() { return max(root)->key; }
     int size() { return size(this->root); }
     Value get(Key key) { return get(root, key); }
     void put(Key key, Value val) { root = put(root, key, val); }
@@ -323,8 +310,10 @@ public:
     int rank(Key key) { return rank(key, root); }
     void deleteMin() { root = deleteMin(root); }
     void deleteMax() { root = deleteMax(root); }
-    void deletenode(Key key) { root = delete (root, key); }
+    void deletenode(Key key) { root = deletenode(root, key); } 
     bool isEmpty() { return root == NULL; }
+    BinaryTree() { this->root = NULL; }
+    ~BinaryTree() {}
 
     std::queue<Key> keys()
     {
@@ -352,12 +341,9 @@ public:
         return queue;
     }
 
-    BinaryTree(){this->root = NULL;}
-    ~BinaryTree(){}
-
     Key floor(Key key)
     {
-        Node * x = floor(root, key);
+        Node *x = floor(root, key);
         if (x == NULL)
         {
             return NULL;
@@ -366,7 +352,7 @@ public:
     }
     Key ceiling(Key key)
     {
-        Node * x = ceiling(root, key);
+        Node *x = ceiling(root, key);
         if (x == NULL)
         {
             return NULL;
@@ -375,43 +361,4 @@ public:
     }
 };
 
-/**
-     * Removes the smallest key and associated value from the symbol table.
-     *
-     * @throws NoSuchElementException if the symbol table is empty
-     */
-
-/**
-     * Removes the largest key and associated value from the symbol table.
-     *
-     * @throws NoSuchElementException if the symbol table is empty
-     */
-
-/**
-     * Removes the specified key and its associated value from this symbol table     
-     * (if the key is in this symbol table).    
-     *
-     * @param  key the key
-     * @throws IllegalArgumentException if {@code key} is {@code NULL}
-     */
-
-/**
-     * Returns all keys in the symbol table as an {@code Iterable}.
-     * To iterate over all of the keys in the symbol table named {@code st},
-     * use the foreach notation: {@code for (Key key : st.keys())}.
-     *
-     * @return all keys in the symbol table
-     */
-
-/**
-     * Returns all keys in the symbol table in the given range,
-     * as an {@code Iterable}.
-     *
-     * @param  lo minimum endpoint
-     * @param  hi maximum endpoint
-     * @return all keys in the symbol table between {@code lo} 
-     *         (inclusive) and {@code hi} (inclusive)
-     * @throws IllegalArgumentException if either {@code lo} or {@code hi}
-     *         is {@code NULL}
-     */
 #endif
