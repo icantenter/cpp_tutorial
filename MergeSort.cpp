@@ -14,7 +14,7 @@ void merge_sort(Comparable arr[], int len)
         //start < len 可以访问到每一个数
         for (int start = 0; start < len; start += delta + delta)
         {
-            //st::min确保不会越界
+            //std::min确保不会越界
             int low = start, mid = std::min(start + delta, len), high = std::min(start + delta + delta, len);
             int k = low;
             int start1 = low, end1 = mid;
