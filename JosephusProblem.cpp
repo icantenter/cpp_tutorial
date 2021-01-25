@@ -1,6 +1,6 @@
 #include <iostream>
 using namespace std;
-const int m = 3;
+const int m = 6;
 int main()
 {
     int n, f = 0;

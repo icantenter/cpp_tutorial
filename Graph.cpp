@@ -40,12 +40,18 @@ int main()
 {
     ALGraph G;
     marked = new int[G.vexnum];
+    int PathMatrix[MAX_VERTEX_NUM][MAX_VERTEX_NUM], DisMatrix[MAX_VERTEX_NUM][MAX_VERTEX_NUM];
     memset(marked, 0, sizeof(int) * G.vexnum);
 
     std::cin >> G.vexnum >> G.arcnum;
     for (int i = 0; i < G.vexnum; i++) 
     {
         G.vertices[i].firstarc = NULL;
+        for (int j = 0; j < G.vexnum;j++) 
+        {
+            DisMatrix[i][j] = INT_MAX;
+            PathMatrix[i][j] = -1;
+        }
     }
     
     for (int i = 0; i < G.arcnum; i++)
@@ -53,11 +59,14 @@ int main()
         int v, w, a;
         std::cin >> v >> w >> a;
         addEdge(G, v, w, a);
-        addEdge(G, w, v, a);
+        //addEdge(G, w, v, a);
+        //DisMatrix[v][w] = a;
+
     }
     
     // dfs(G, 0);
-    bfs(G, 0);
+    //bfs(G, 0);
+    //floyd(G, PathMatrix, DisMatrix);
     std::cout << ">";
     return 0;
 }
@@ -82,19 +91,64 @@ void bfs(ALGraph G, int x)
         }
         
     }
+}
 
-
+int distTo[MAX_VERTEX_NUM];
+int edgeTo[MAX_VERTEX_NUM];
+void relax(ALGraph G, int from)
+{
+    for (int to : adj(G, from))
+    {
+        if (distTo[to] > distTo[from] + weight(G, from, to))
+        {
+            distTo[to] = distTo[from] + weight(G,from, to);
+            edgeTo[to] = from; 
+        }
+    }
+    
 }
 
 void dijkstra(ALGraph G)
 {
-    std::priority_queue<node> 
+    std::priority_queue<std::tuple<int, int>> pq{}; 
+
+    while (!pq.empty())
+    {
+        pq.min
+        relax(G, )
+    }
+
+
 }
+
+int weight(ALGraph G, int from, int to)
+{
+    VNode tmp = G.vertices[from];
+
+    ArcNode* head = tmp.firstarc;
+
+    while (head->adjvex != to)
+    {
+        head = head->nextarc;
+    }
+    return head->info;
+}
+// void floyd(ALGraph G, int PathMatrix[][MAX_VERTEX_NUM], int DisMatrix[][MAX_VERTEX_NUM])
+// {
+    
+
+//     for (int i = 0; i < size; i++) 
+//     {
+        
+//     }
+    
+// }
+
+
 
 void dfs(ALGraph G, int x)
 {
     
-
     for (auto &&v : adj(G, x))
     {
         if (!marked[v])
@@ -103,8 +157,6 @@ void dfs(ALGraph G, int x)
             std::cout << v << std::endl;
             dfs(G, v);
         }
-        
-        
     }
     //cout << x << endl;
     
